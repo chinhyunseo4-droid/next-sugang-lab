@@ -54,7 +54,7 @@
 | 서버 -> 화면 | `time` | `{ t0, server }` | 서버 시계. `offset = server + (t1 - t0) / 2 - t1` | L5 |
 | 서버 -> 모두 | `seats` | `{ key, count, cap }` | 누가 신청하거나 취소했다 | L6 |
 | 화면 -> 서버 | `ai_plan` | `{ prompt }` | AI 에게 시간표를 부탁한다 (300자까지) | L7 |
-| 서버 -> 화면 | `ai_start` | `{ id, live, model }` | 시작. `live: false` 면 모의 AI | L7 |
+| 서버 -> 화면 | `ai_start` | `{ id, live, provider, model }` | 시작. `live: false` 면 모의 AI. provider 는 Claude, OpenAI, Gemini, mock | L7 |
 | 서버 -> 화면 | `ai_tool` | `{ id, name, input }` | AI 가 도구를 불렀다 | L7 |
 | 서버 -> 화면 | `ai_tool_result` | `{ id, name, summary }` | 도구 결과 요약 | L7 |
 | 서버 -> 화면 | `ai_delta` | `{ id, text }` | AI 가 쓰는 글자 (스트리밍) | L7 |

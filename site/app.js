@@ -318,7 +318,7 @@
     var out = $('ai-out');
     if (type === 'ai_start') {
       state.ai = { text: '' };
-      out.innerHTML = '<p class="ai-meta">' + (p.live ? '모델 ' + esc(p.model) : '모의 AI (서버에 API 키 없음)') + '</p><ul class="ai-steps"></ul><p class="ai-text"></p><div class="ai-plan"></div>';
+      out.innerHTML = '<p class="ai-meta">' + (p.live ? esc(p.provider) + ' · ' + esc(p.model) : '모의 AI (서버에 API 키 없음)') + '</p><ul class="ai-steps"></ul><p class="ai-text"></p><div class="ai-plan"></div>';
       return;
     }
     if (!state.ai) return;

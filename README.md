@@ -30,7 +30,17 @@ npm run dev
 - 수강신청 사이트: http://localhost:3000 (오른쪽 위에서 샘플 학생을 고르고 Login)
 - 대기열 운영 콘솔: http://localhost:4000/console/ (수강신청 시작 시각, 입장 속도, 가상 대기자)
 
-`.env` 는 없어도 된다. AI 를 진짜 모델로 돌리고 싶으면 `cp .env.example .env` 후 `ANTHROPIC_API_KEY` 를 넣는다. 키가 없으면 모의 AI 로 같은 흐름이 돈다.
+`.env` 는 없어도 된다. 키가 없으면 AI 는 모의 AI 로 같은 흐름이 돈다.
+
+AI 를 진짜 모델로 돌리려면 `cp .env.example .env` 후 Claude, OpenAI, Gemini 중 **쓰고 싶은 회사 하나의 키**를 넣는다. 키는 각자 발급한다.
+
+| 회사 | 키 발급 | `.env` | 기본 모델 |
+|------|--------|--------|----------|
+| Claude | https://console.anthropic.com | `ANTHROPIC_API_KEY` | claude-opus-5-5 |
+| OpenAI | https://platform.openai.com | `OPENAI_API_KEY` | gpt-6-luna |
+| Gemini | https://aistudio.google.com (무료 사용량 있음) | `GEMINI_API_KEY` | gemini-3.6-flash |
+
+`AI_PROVIDER` 로 회사를(비우면 키가 있는 첫 회사), `AI_MODEL` 로 모델을 바꾼다. 서버를 켜면 터미널에 `> AI 시간표  Claude claude-opus-5-5` 처럼 지금 쓰는 모델이 찍힌다.
 
 ## 구성
 
@@ -49,6 +59,7 @@ npm run dev
 | `site/` | 학교(고객사) | 수강신청 화면. head 에 대기열 스니펫 한 줄이 붙어 있다 |
 | `server/school.js` | 학교(고객사) | 수강신청 API, 세션, 정원, `/live` WebSocket |
 | `server/ai.js` | 학교(고객사) | AI 시간표 에이전트. 학교 서버의 도구를 빌려 쓴다 |
+| `server/providers.js` | 학교(고객사) | Claude, OpenAI, Gemini 연결부. 회사마다 다른 메시지 모양을 맞춘다 |
 | `sdk/queue.js` | 우리 | 학교 페이지에서 실행되는 로더. iframe 을 띄우고 편지를 중계한다 |
 | `widget/` | 우리 | iframe 안의 대기 화면. 대기열 서버와 WebSocket 으로 이야기한다 |
 | `console/` | 우리 | 대기열 운영 콘솔 |
@@ -75,4 +86,4 @@ docs/MISSIONS.md 의 L1 만 해 줘. sdk/queue.js 의 TODO [L1] 만 채우고 �
 
 - 이 사이트는 실습용 클론이다. 실제 고려대학교 수강신청과 무관하고, 학교 로고나 자산은 쓰지 않았다.
 - 0부와 H5 는 **이 저장소의 로컬 서버에서만** 한다. 실제 학교 사이트를 상대로 매크로를 만들거나 돌리지 않는다.
-- 비밀값(`QUEUE_SECRET`, `ANTHROPIC_API_KEY`)은 `.env` 에만 둔다. `site/`, `sdk/`, `widget/`, `console/` 은 브라우저로 내려가는 파일이라 비밀값을 쓰면 안 된다.
+- 비밀값(`QUEUE_SECRET`, AI 키)은 `.env` 에만 둔다. `site/`, `sdk/`, `widget/`, `console/` 은 브라우저로 내려가는 파일이라 비밀값을 쓰면 안 된다.

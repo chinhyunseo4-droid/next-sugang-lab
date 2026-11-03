@@ -13,10 +13,11 @@ import { sendFile, sendJson } from './http.js';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 loadEnv(join(ROOT, '.env'));
 
-// ai.js 가 .env 를 읽은 뒤에 불려야 해서 동적으로 가져온다
+// ai.js 가 .env 를 읽은 뒤에 불려야 해서(키, AI_PROVIDER) 동적으로 가져온다
 const { createSchool } = await import('./school.js');
 const { createQueue } = await import('./queue.js');
 const { createSim } = await import('./sim.js');
+const { aiInfo } = await import('./ai.js');
 
 const SITE_PORT = 3000;
 const QUEUE_PORT = 4000;
@@ -82,5 +83,5 @@ queueServer.on('upgrade', (req, socket, head) => {
 });
 queueServer.listen(QUEUE_PORT, () => {
   console.log(`> NEXT Queue       ${QUEUE_ORIGIN}  (콘솔 ${QUEUE_ORIGIN}/console/)`);
-  console.log(`> AI 시간표        ${process.env.ANTHROPIC_API_KEY || process.env.AI_MODE === 'live' ? `모델 ${process.env.AI_MODEL || 'claude-opus-5-5'}` : '모의 AI (키 없음)'}`);
+  console.log(`> AI 시간표        ${aiInfo()}`);
 });
