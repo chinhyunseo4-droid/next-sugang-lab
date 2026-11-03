@@ -4,16 +4,16 @@
 창 두 개를 나란히 둡니다. 왼쪽은 http://localhost:3000 (수강신청), 오른쪽은 http://localhost:4000/console/ (운영 콘솔)입니다.
 개발자도구는 F12 (맥은 Cmd+Option+I)로 엽니다.
 
-세션 안에서는 0부와 1부(L4 까지)를 목표로 합니다. 2부는 남는 시간과 다음 주까지의 도전 과제입니다.
+세션 안에서는 0부와 1부(L4 까지)를 목표로 합니다. 시간은 대충입니다. 못 끝내도 괜찮고, 남은 것과 2부는 다음 주까지 해 오면 됩니다.
 
-| 단계 | 시간 | 파일 | 끝나면 보이는 것 |
+| 단계 | 언제 | 파일 | 끝나면 보이는 것 |
 |------|------|------|----------------|
-| H1~H4 뚫어 보기 | 10분 | 없음 (개발자도구만) | 버튼 없이 API 로 신청되고, 화면 잠금과 서버 검사의 차이가 보입니다 |
-| L1 스크립트 한 줄 | 6분 | sdk/queue.js | 신청을 누르면 대기 화면 iframe 이 뜹니다 |
-| L2 편지 | 7분 | sdk/queue.js, widget/widget.js | 3초 기다리면 대기 화면이 닫히고 신청됩니다 |
-| L3 대기열 | 10분 | server/queue.js, widget/widget.js | 내 앞 인원이 실시간으로 줄어들고, 콘솔에서 속도를 바꾸면 바로 반영됩니다 |
-| H5 대기열 뚫기 | 3분 | 없음 (Console) | 줄을 서지 않고도 신청이 됩니다 |
-| L4 통과 토큰 | 8분 | server/token.js, server/queue.js, server/school.js | H2·H5 우회가 `403 queue_required` 로 막힙니다 |
+| H1~H4 뚫어 보기 | 세션 | 없음 (개발자도구만) | 버튼 없이 API 로 신청되고, 화면 잠금과 서버 검사의 차이가 보입니다 |
+| L1 스크립트 한 줄 | 세션 | sdk/queue.js | 신청을 누르면 대기 화면 iframe 이 뜹니다 |
+| L2 편지 | 세션 | sdk/queue.js, widget/widget.js | 3초 기다리면 대기 화면이 닫히고 신청됩니다 |
+| L3 대기열 | 세션 | server/queue.js, widget/widget.js | 내 앞 인원이 실시간으로 줄어들고, 콘솔에서 속도를 바꾸면 바로 반영됩니다 |
+| H5 대기열 뚫기 | 세션 | 없음 (Console) | 줄을 서지 않고도 신청이 됩니다 |
+| L4 통과 토큰 | 세션 | server/token.js, server/queue.js, server/school.js | H2·H5 우회가 `403 queue_required` 로 막힙니다 |
 | L5 끊겨도 버티기 | 도전 | server/queue.js, widget/widget.js, server/school.js, site/app.js | 새로고침해도 순번이 유지되고, 시계가 서버 시간으로 바뀝니다 |
 | L6 진짜처럼 | 도전 | server/school.js, site/app.js | 잔여석이 실시간으로 줄고, 연타하면 보안문자가 뜹니다 |
 | L7 AI 에이전트 | 도전 | server/school.js, server/ai.js (server/providers.js 읽기) | AI 가 학교 서버의 도구를 불러 가며 시간표를 짜는 과정이 실시간으로 보입니다 |
