@@ -170,7 +170,7 @@ AI 는 데이터베이스를 직접 보지 않습니다. 학교 서버가 빌려
 ## 막히면
 
 - 확인 순서: 터미널(서버 로그) -> 브라우저 Console -> Network (Fetch/XHR, WS) -> Elements
-- iframe 이 안 뜨면: Console 에 `Refused to frame` 이 있는지 봅니다. `frame-ancestors` 는 server/index.js 에 있습니다
+- iframe 이 안 뜨면: Console 에서 `frame-ancestors` 로 검색합니다. Chrome 은 `Framing 'http://localhost:4000/' violates the following Content Security Policy directive: "frame-ancestors http://localhost:3000"` 처럼 보여 줍니다. 이 설정은 server/index.js 에 있습니다
 - 편지가 안 오면: 보내는 쪽 targetOrigin 과 받는 쪽 `e.origin` 이 같은지 봅니다
 - WebSocket 이 바로 끊기면: server/index.js 의 Origin 검사를 봅니다. 위젯과 콘솔은 :4000 에서 열려야 합니다
 
