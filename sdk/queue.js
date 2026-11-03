@@ -22,8 +22,9 @@
     if (document.querySelector('style[data-next-queue]')) return;
     var style = document.createElement('style');
     style.setAttribute('data-next-queue', '');
+    // color-scheme 을 iframe 안 문서(light dark)와 맞춘다. 다르면 브라우저가 iframe 바탕을 불투명하게 칠해 뒤 페이지가 가려진다
     style.textContent =
-      '.nq-frame{position:fixed;inset:0;z-index:2147483647;width:100%;height:100%;border:0;background:transparent;color-scheme:normal}';
+      '.nq-frame{position:fixed;inset:0;z-index:2147483647;width:100%;height:100%;border:0;background:transparent;color-scheme:light dark}';
     document.head.appendChild(style);
   }
 
