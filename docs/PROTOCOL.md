@@ -27,10 +27,10 @@
 | 서버 -> 위젯 | `wait` | `{ ahead, behind, eta }` | 순번이 바뀌었습니다. 같은 내용이면 보내지 않습니다 | L3 |
 | 서버 -> 위젯 | `pass` | `{ token }` | 차례가 왔습니다. L4 전에는 `token: null` 입니다 | L3, L4 |
 | 위젯 -> 서버 | `leave` | `{}` | 줄에서 빠집니다 | L3 |
-| 서버 -> 위젯 | `error` | `{ code }` | `bad_action`, `expired` 중 하나입니다 | L3, L5 |
-| 위젯 -> 서버 | `resume` | `{ ticketId }` | 다시 붙었으니 원래 순번으로 돌려 달라는 요청입니다 (15초까지) | L5 |
-| 서버 -> 모두 | `ping` | `{ t }` | 10초마다 살아 있는지 묻습니다 | L5 |
-| 모두 -> 서버 | `pong` | `{ t }` | ping 에 대한 답입니다. 오지 않으면 서버가 연결을 끊습니다 | L5 |
+| 서버 -> 위젯 | `error` | `{ code }` | `bad_action`, `expired` 중 하나입니다 | L3, L6 |
+| 위젯 -> 서버 | `resume` | `{ ticketId }` | 다시 붙었으니 원래 순번으로 돌려 달라는 요청입니다 (15초까지) | L6 |
+| 서버 -> 모두 | `ping` | `{ t }` | 10초마다 살아 있는지 묻습니다 | L6 |
+| 모두 -> 서버 | `pong` | `{ t }` | ping 에 대한 답입니다. 오지 않으면 서버가 연결을 끊습니다 | L6 |
 
 ### 운영 콘솔 (같은 `/ws`)
 
@@ -50,17 +50,17 @@
 |------|------|---------|----|------|
 | 서버 -> 화면 | `hello` | `{ openAt, seats: [{ key, count, cap }] }` | 처음 붙었을 때 옵니다 | - |
 | 서버 -> 화면 | `schedule` | `{ openAt }` | 수강신청 시작 시각이 바뀌었습니다 | - |
-| 화면 -> 서버 | `time` | `{ t0 }` | 내 시계로 잰 보낸 시각입니다 | L5 |
-| 서버 -> 화면 | `time` | `{ t0, server }` | 서버 시계입니다. `offset = server + (t1 - t0) / 2 - t1` | L5 |
-| 서버 -> 모두 | `seats` | `{ key, count, cap }` | 누군가 신청하거나 취소했습니다 | L6 |
-| 화면 -> 서버 | `ai_plan` | `{ prompt }` | AI 에게 시간표를 부탁합니다 (300자까지) | L7 |
-| 서버 -> 화면 | `ai_start` | `{ id, live, provider, model }` | 시작합니다. `live: false` 면 모의 AI 입니다. provider 는 Claude, OpenAI, Gemini, mock 중 하나입니다 | L7 |
-| 서버 -> 화면 | `ai_tool` | `{ id, name, input }` | AI 가 도구를 불렀습니다 | L7 |
-| 서버 -> 화면 | `ai_tool_result` | `{ id, name, summary }` | 도구 결과 요약입니다 | L7 |
-| 서버 -> 화면 | `ai_delta` | `{ id, text }` | AI 가 쓰는 글자입니다 (스트리밍) | L7 |
-| 서버 -> 화면 | `ai_plan` | `{ id, keys, summary }` | 최종 제안입니다 | L7 |
-| 서버 -> 화면 | `ai_error` | `{ id, message }` | 실패했습니다 | L7 |
-| 서버 -> 화면 | `ai_done` | `{ id }` | 끝났습니다 | L7 |
+| 화면 -> 서버 | `time` | `{ t0 }` | 내 시계로 잰 보낸 시각입니다 | L6 |
+| 서버 -> 화면 | `time` | `{ t0, server }` | 서버 시계입니다. `offset = server + (t1 - t0) / 2 - t1` | L6 |
+| 서버 -> 모두 | `seats` | `{ key, count, cap }` | 누군가 신청하거나 취소했습니다 | L7 |
+| 화면 -> 서버 | `ai_plan` | `{ prompt }` | AI 에게 시간표를 부탁합니다 (300자까지) | L5 |
+| 서버 -> 화면 | `ai_start` | `{ id, live, provider, model }` | 시작합니다. `live: false` 면 모의 AI 입니다. provider 는 Claude, OpenAI, Gemini, mock 중 하나입니다 | L5 |
+| 서버 -> 화면 | `ai_tool` | `{ id, name, input }` | AI 가 도구를 불렀습니다 | L5 |
+| 서버 -> 화면 | `ai_tool_result` | `{ id, name, summary }` | 도구 결과 요약입니다 | L5 |
+| 서버 -> 화면 | `ai_delta` | `{ id, text }` | AI 가 쓰는 글자입니다 (스트리밍) | L5 |
+| 서버 -> 화면 | `ai_plan` | `{ id, keys, summary }` | 최종 제안입니다 | L5 |
+| 서버 -> 화면 | `ai_error` | `{ id, message }` | 실패했습니다 | L5 |
+| 서버 -> 화면 | `ai_done` | `{ id }` | 끝났습니다 | L5 |
 
 ## 4. 통과 토큰 (L4)
 
@@ -98,4 +98,4 @@ body    = { t: ticketId, s: 학번, a: 'enroll', exp: 만료 시각(ms, 30초 �
 | 403 | `token_used` | 같은 토큰을 다시 썼습니다 (L4) |
 | 404 | `no_course` | 없는 학수번호·분반입니다 |
 | 409 | `duplicate` / `conflict` / `credit_limit` / `full` | 중복, 시간 겹침, 학점 초과, 정원 초과입니다 |
-| 429 | `captcha_required` | 매크로 방지에 걸렸습니다 (L6) |
+| 429 | `captcha_required` | 매크로 방지에 걸렸습니다 (L7) |

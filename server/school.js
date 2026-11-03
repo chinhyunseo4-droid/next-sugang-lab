@@ -1,14 +1,14 @@
 // 학교 수강신청 서버 (:3000). 고객사 역할이다. 대기열은 남의 서비스(NEXT Queue)를 붙여 쓴다.
 //   - 세션 쿠키로 학생을 알아본다 (HttpOnly 라 브라우저 JS 는 못 읽는다)
 //   - 수강신청 API: 기간, 통과 토큰(L4), 중복, 시간 겹침, 학점, 정원을 서버가 직접 확인한다
-//   - /live WebSocket: 서버 시간 맞추기(L5), 실시간 잔여석(L6), AI 시간표 에이전트(L7)
+//   - /live WebSocket: AI 시간표 에이전트(L5), 서버 시간 맞추기(L6), 실시간 잔여석(L7)
 import crypto from 'node:crypto';
 import { COURSES, COURSE_BY_KEY, MAX_CREDITS, SEMESTER, STUDENTS, timeLabel } from './data.js';
 import { cookies, readJson, sendJson } from './http.js';
 import { verifyToken } from './token.js';
 import { runAgent } from './ai.js';
 
-// 학교 서버의 시계는 일부러 조금 어긋나 있다. 실제로도 서버 시계와 내 컴퓨터 시계는 다르다 (L5 에서 맞춘다)
+// 학교 서버의 시계는 일부러 조금 어긋나 있다. 실제로도 서버 시계와 내 컴퓨터 시계는 다르다 (L6 에서 맞춘다)
 const SKEW = Number(process.env.SCHOOL_CLOCK_SKEW_MS ?? 2300);
 const now = () => Date.now() + SKEW;
 
@@ -17,8 +17,8 @@ export function createSchool({ secret }) {
   const seats = new Map(COURSES.map((c) => [c.key, new Set()])); // 과목 -> 신청한 학번들
   const mine = new Map(); // 학번 -> Set(과목 key)
   const usedTickets = new Set(); // 한 번 쓴 통과 토큰 (L4)
-  const attempts = new Map(); // 학번 -> 최근 신청 시각들 (L6)
-  const captchas = new Map(); // 학번 -> 정답 문자열 (L6)
+  const attempts = new Map(); // 학번 -> 최근 신청 시각들 (L7)
+  const captchas = new Map(); // 학번 -> 정답 문자열 (L7)
   const lives = new Set(); // /live 에 붙은 소켓
   let openAt = now() + 60_000; // 수강신청 시작 시각. 운영 콘솔에서 바꾼다
 
@@ -85,7 +85,7 @@ export function createSchool({ secret }) {
     taken.add(studentId);
     keys.add(key);
 
-    // TODO [L6] 잔여석이 바뀌었다고 모두에게 알린다
+    // TODO [L7] 잔여석이 바뀌었다고 모두에게 알린다
     //   - broadcast({ type: 'seats', payload: { key, count: taken.size, cap: course.cap } })
     return { ok: true, status: 200 };
   }
@@ -98,7 +98,7 @@ export function createSchool({ secret }) {
     return { ok: true, status: 200 };
   }
 
-  // TODO [L6] 매크로 방지: 10초 안에 6번 넘게 신청하면 보안문자를 풀어야 계속할 수 있다
+  // TODO [L7] 매크로 방지: 10초 안에 6번 넘게 신청하면 보안문자를 풀어야 계속할 수 있다
   //   - attempts 에 학번별 시각을 쌓고 10초 지난 것은 버린다
   //   - 넘으면 captchas 에 5글자 정답을 만들어 두고 { status: 429, code: 'captcha_required' } 를 돌려준다
   //   - 정답이 걸려 있는 동안에는 계속 429
@@ -208,11 +208,11 @@ export function createSchool({ secret }) {
       }
       const p = msg.payload || {};
 
-      // TODO [L5] 서버 시간 알려 주기
+      // TODO [L6] 서버 시간 알려 주기
       //   - { type: 'time', payload: { t0 } } 를 받으면 { type: 'time', payload: { t0, server: now() } } 로 바로 돌려준다
       //   - 브라우저가 보낸 시각(t0), 받은 시각(t1), 서버 시각으로 시계 차이를 계산한다 (site/app.js)
 
-      // TODO [L7] AI 시간표 에이전트
+      // TODO [L5] AI 시간표 에이전트
       //   - { type: 'ai_plan', payload: { prompt } } 를 받으면 runAgent 를 부르고, 나오는 이벤트를 그대로 send 한다
       //   - 한 사람당 동시에 하나만 (busy). 프롬프트는 300자로 자른다
       //   - 에이전트가 쓰는 도구는 이 서버의 함수들이다: 과목 검색, 잔여석, 시간 겹침 검사
@@ -220,7 +220,7 @@ export function createSchool({ secret }) {
     ws.on('close', () => lives.delete(ws));
   }
 
-  // AI 에이전트에게 빌려주는 도구. 에이전트는 이 함수들을 통해서만 데이터에 닿는다 (L7)
+  // AI 에이전트에게 빌려주는 도구. 에이전트는 이 함수들을 통해서만 데이터에 닿는다 (L5)
   function agentTools(student) {
     return {
       search_courses({ query = '', type = '' } = {}) {

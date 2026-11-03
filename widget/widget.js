@@ -88,14 +88,14 @@
   }
 
   function joinLine() {
-    // TODO [L5] 새로고침하거나 끊겼다 붙으면, 새로 줄 서지 말고 원래 티켓으로 돌아간다
+    // TODO [L6] 새로고침하거나 끊겼다 붙으면, 새로 줄 서지 말고 원래 티켓으로 돌아간다
     //   - sessionStorage 의 STORE 에서 ticketId 를 꺼내 있으면 send('resume', { ticketId }) 하고 return
     send('join', { key: start.key, studentId: start.studentId, action: start.action });
   }
 
   function onClose() {
     if (closedByUs) return;
-    // TODO [L5] 끊기면 다시 붙기
+    // TODO [L6] 끊기면 다시 붙기
     //   - 1초, 2초, 4초, 최대 8초 간격으로 connect() 를 다시 부른다 (retry 로 횟수 세기)
     //   - 서버가 순번을 15초 동안 지켜 준다 (server/queue.js 의 GRACE)
     setStatus('연결이 끊겼습니다. 대기를 취소하고 다시 신청하세요.');
@@ -104,7 +104,7 @@
   function handle(msg) {
     var p = msg.payload || {};
 
-    // TODO [L5] 하트비트 응답
+    // TODO [L6] 하트비트 응답
     //   - 'ping' 을 받으면 send('pong', { t: p.t }) 로 바로 답한다. 안 하면 서버가 죽은 연결로 보고 끊는다
 
     // TODO [L3] 서버가 보내는 메시지 처리

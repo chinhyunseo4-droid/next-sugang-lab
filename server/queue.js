@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { signToken } from './token.js';
 
 const TOKEN_TTL = 30_000; // 통과 토큰 유효 시간
-const GRACE = 15_000; // 끊긴 뒤 순번을 지켜 주는 시간 (L5)
+const GRACE = 15_000; // 끊긴 뒤 순번을 지켜 주는 시간 (L6)
 
 export function createQueue({ secret }) {
   const line = []; // 줄. 앞에서부터 입장한다. 원소는 ticket
@@ -81,7 +81,7 @@ export function createQueue({ secret }) {
     for (const ws of consoles) send(ws, { type: 'stats', payload: stats });
   }, 500);
 
-  // TODO [L5] 끊긴 사람 정리하기
+  // TODO [L6] 끊긴 사람 정리하기
   //   - 소켓이 끊긴 ticket 은 leftAt 을 기록해 두고 GRACE 동안은 줄에서 빼지 않는다 (새로고침해도 순번 유지)
   //   - GRACE 가 지나도 돌아오지 않으면 remove 한다
 
@@ -92,7 +92,7 @@ export function createQueue({ secret }) {
     let alive = true;
     let beat = null;
 
-    // TODO [L5] 하트비트: 10초마다 ping 을 보내고, pong 이 안 오면 끊는다
+    // TODO [L6] 하트비트: 10초마다 ping 을 보내고, pong 이 안 오면 끊는다
     //   - 브라우저 WebSocket 은 프로토콜 ping 을 직접 못 보내서, 앱 메시지 { type: 'ping' } / { type: 'pong' } 로 한다
     //   - alive 가 false 인 채로 다음 차례가 오면 ws.terminate()
     //   - Network > WS 탭에서 10초마다 오가는 ping/pong 프레임이 보인다
@@ -137,7 +137,7 @@ export function createQueue({ secret }) {
       //   - { type: 'joined', payload: { ticketId, ahead } } 로 답한다
       //   - { type: 'leave' } 를 받으면 remove(ticket)
 
-      // TODO [L5] 다시 붙기
+      // TODO [L6] 다시 붙기
       //   - { type: 'resume', payload: { ticketId } } 를 받으면 tickets 에서 찾아 ws 를 새 소켓으로 바꾸고 leftAt 을 지운다
       //   - 못 찾으면 { type: 'error', payload: { code: 'expired' } } (위젯은 처음부터 다시 줄을 선다)
     });
@@ -146,7 +146,7 @@ export function createQueue({ secret }) {
       clearInterval(beat);
       consoles.delete(ws);
       if (ticket && ticket.ws === ws) {
-        // TODO [L5] 끊겨도 바로 빼지 않는다
+        // TODO [L6] 끊겨도 바로 빼지 않는다
         //   - remove 대신 ticket.leftAt = Date.now() 만 기록한다 (정리는 위의 GRACE 타이머가 한다)
         remove(ticket);
       }

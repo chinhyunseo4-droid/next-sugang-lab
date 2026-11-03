@@ -1,4 +1,4 @@
-// AI 시간표 에이전트 (L7). 학교 서버 안에서 돈다. 브라우저는 /live WebSocket 으로 과정을 실시간으로 받는다.
+// AI 시간표 에이전트 (L5). 학교 서버 안에서 돈다. 브라우저는 /live WebSocket 으로 과정을 실시간으로 받는다.
 //   - 모델은 데이터를 직접 못 본다. 우리가 빌려준 도구(과목 검색, 시간표 확인, 내 상태)를 불러서만 본다
 //   - 도구 결과를 보고 다시 생각하고, 다시 도구를 부른다 (에이전트 루프). 끝나면 propose_plan 으로 제안을 낸다
 //   - Claude, OpenAI, Gemini 중 하나를 .env 로 고른다 (server/providers.js). 키가 없으면 모의 에이전트가 같은 흐름을 흉내 낸다
@@ -114,7 +114,7 @@ function summarize(name, out) {
 
 // ---- 진짜 모델 ------------------------------------------------------------
 async function liveAgent({ id, prompt, student, tools, emit }) {
-  // TODO [L7] 에이전트 루프 (진짜 모델)
+  // TODO [L5] 에이전트 루프 (진짜 모델)
   //   - 어느 회사 모델이든 루프는 같다. 회사별 차이는 server/providers.js 가 맞춰 준다
   //   1) const session = provider.start({ system: systemPrompt(student), prompt, tools: TOOLS })
   //   2) const step = await session.next((text) => emit({ type: 'ai_delta', payload: { id, text } }))
@@ -124,7 +124,7 @@ async function liveAgent({ id, prompt, student, tools, emit }) {
   //      session.reply([{ id, name, output, isError }]) 로 결과를 돌려준다
   //   5) 2) 로 돌아간다. 단 MAX_TURNS 번을 넘으면 멈춘다 (비용 상한)
   //   - 키가 없으면 mockAgent 가 같은 순서로 흉내 낸다. 그 코드를 먼저 읽어 보라
-  throw new Error('L7: server/ai.js 의 liveAgent 를 채우세요. 키 없이 보려면 .env 의 AI_PROVIDER=mock');
+  throw new Error('L5: server/ai.js 의 liveAgent 를 채우세요. 키 없이 보려면 .env 의 AI_PROVIDER=mock');
 }
 
 // ---- 키가 없을 때 쓰는 모의 에이전트 -------------------------------------

@@ -1,13 +1,13 @@
 // 학교 수강신청 화면 (고객사 코드, :3000).
 //   - 신청 버튼 -> NextQueue('enter') 로 대기열 통과 -> 받은 토큰을 붙여 POST /api/enroll
-//   - /live WebSocket 으로 서버 시간(L5), 실시간 잔여석(L6), AI 시간표 도우미(L7) 를 받는다
+//   - /live WebSocket 으로 AI 시간표 도우미(L5), 서버 시간(L6), 실시간 잔여석(L7) 을 받는다
 // '뚫어 보기'(개발자도구) 단계를 위해 일부러 남겨 둔 구멍이 있다. docs/MISSIONS.md 의 H1~H5 를 보라.
 
 (function () {
   var state = {
     me: null,
     openAt: 0,
-    offset: 0, // 서버 시계 - 내 시계 (ms). L5 에서 계산한다
+    offset: 0, // 서버 시계 - 내 시계 (ms). L6 에서 계산한다
     synced: false,
     seats: {}, // key -> { count, cap }
     lastSearch: [],
@@ -211,7 +211,7 @@
     ]);
   }
 
-  // 매크로 방지 보안문자 (L6). 실제 사이트처럼 소문자는 대문자로 바꿔 받는다
+  // 매크로 방지 보안문자 (L7). 실제 사이트처럼 소문자는 대문자로 바꿔 받는다
   function captcha() {
     dialog('보안문자 입력', '짧은 시간에 신청이 너무 많습니다. 아래 문자를 입력하세요.' +
       '<img alt="보안문자" width="160" height="56" src="/api/captcha?t=' + Date.now() + '">' +
@@ -298,7 +298,7 @@
     };
   }
 
-  // TODO [L5] 서버 시간 맞추기
+  // TODO [L6] 서버 시간 맞추기
   //   - syncTime: live 로 { type: 'time', payload: { t0: Date.now() } } 를 보낸다. 30초마다 다시
   //   - onTime(p): t1 = Date.now(), 왕복 시간 rtt = t1 - p.t0
   //     서버가 답을 만든 순간은 왕복의 가운데쯤이다. offset = p.server + rtt / 2 - t1
@@ -307,12 +307,12 @@
   function syncTime() {}
   function onTime() {}
 
-  // TODO [L6] 실시간 잔여석
+  // TODO [L7] 실시간 잔여석
   //   - onSeats(p): state.seats[p.key] = { count: p.count, cap: p.cap }
   //   - 화면의 [data-seat="키"] 요소를 모두 찾아 seatCell 과 같은 글자/클래스로 바꾸고, 잠깐 'flash' 클래스를 준다
   function onSeats() {}
 
-  // ---- AI 시간표 도우미 화면 (서버 쪽 에이전트는 L7) ----------------------
+  // ---- AI 시간표 도우미 화면 (서버 쪽 에이전트는 L5) ----------------------
   var TOOL_LABEL = { search_courses: '과목 검색', check_timetable: '시간표 확인', my_status: '내 상태 확인', propose_plan: '제안 정리' };
   function onAi(type, p) {
     var out = $('ai-out');
