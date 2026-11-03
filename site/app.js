@@ -1,7 +1,7 @@
 // 학교 수강신청 화면 (고객사 코드, :3000).
 //   - 신청 버튼 -> NextQueue('enter') 로 대기열 통과 -> 받은 토큰을 붙여 POST /api/enroll
 //   - /live WebSocket 으로 서버 시간(L5), 실시간 잔여석(L6), AI 시간표 도우미(L7) 를 받는다
-// 0부(개발자도구로 뚫어 보기)에서 일부러 남겨 둔 구멍이 있다. docs/MISSIONS.md 의 H1~H5 를 보라.
+// '뚫어 보기'(개발자도구) 단계를 위해 일부러 남겨 둔 구멍이 있다. docs/MISSIONS.md 의 H1~H5 를 보라.
 
 (function () {
   var state = {
@@ -395,7 +395,7 @@
   });
   $('open-guide').addEventListener('click', function (e) {
     e.preventDefault();
-    dialog('실습 안내', '저장소의 <b>docs/MISSIONS.md</b> 를 여세요. 0부는 개발자도구(F12)로 이 사이트의 구멍을 찾는 것부터 시작합니다.');
+    dialog('실습 안내', '저장소의 <b>docs/MISSIONS.md</b> 를 여세요. 첫 단계인 뚫어 보기는 개발자도구(F12)로 이 사이트의 구멍을 찾습니다.');
   });
 
   $('login-form').addEventListener('submit', function (e) {
