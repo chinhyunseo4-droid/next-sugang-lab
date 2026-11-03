@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>접속 대기</title>
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link rel="stylesheet" href="/widget/widget.css" />
+  </head>
+  <body>
+    <!-- 이 페이지는 고객사 페이지 위에 iframe 으로 뜬다. origin 이 :4000 이라 고객사 DOM 에 손댈 수 없고, 고객사도 여기에 손댈 수 없다 -->
+    <div class="scrim"></div>
+    <section class="card" role="dialog" aria-modal="true" aria-labelledby="title" aria-describedby="desc">
+      <header class="brand">
+        <span class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M4 12h16M4 17h7" /></svg>
+        </span>
+        NEXT Queue
+      </header>
+
+      <h1 id="title">서비스 접속 대기 중입니다</h1>
+      <p class="ahead" aria-live="polite"><span>내 앞에</span> <b id="ahead">-</b><span>명</span></p>
+
+      <div class="bar" role="progressbar" aria-label="대기 진행" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <i id="fill"></i>
+      </div>
+
+      <dl class="meta">
+        <div><dt>예상 대기</dt><dd id="eta">계산 중</dd></div>
+        <div><dt>내 뒤</dt><dd id="behind">-</dd></div>
+      </dl>
+
+      <p id="desc" class="note">접속하는 사람이 많아 차례대로 들어갑니다. 차례가 되면 자동으로 다음 화면으로 넘어갑니다.</p>
+      <p id="status" class="status" role="status"></p>
+
+      <button id="cancel" class="cancel" type="button">대기 취소</button>
+    </section>
+    <script src="/widget/widget.js"></script>
+  </body>
+</html>

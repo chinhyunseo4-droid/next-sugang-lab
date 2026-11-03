@@ -1,0 +1,318 @@
+/* 디자인 토큰. 값의 근거와 규칙은 DESIGN.md 에 있다. 대기 화면과 운영 콘솔이 같이 쓴다.
+   - 색은 반드시 이 변수로만 쓴다 (hex 를 직접 쓰지 않는다)
+   - 어두운 모드의 중립색은 R=G=B 만 쓴다. 푸른 기가 도는 남색 다크는 쓰지 않는다
+   - 강조색은 NEXT 주황 하나. 주황 면 위의 글자는 항상 --on-accent (검정) */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+:root {
+  color-scheme: light dark;
+
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  /* light */
+  --bg: #f5f5f5;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --surface-3: #e6e6e6;
+  --ink: #0a0a0a;
+  --ink-2: #3d3d3d;
+  --ink-3: #6b6b6b;
+  --ink-4: #9a9a9a;
+  --hairline: rgba(0, 0, 0, 0.08);
+  --hairline-strong: rgba(0, 0, 0, 0.14);
+  --accent: #ef7c10;
+  --on-accent: #0a0a0a;
+  --accent-text: #a3520a;
+  --danger: #b42318;
+  --glass: rgba(255, 255, 255, 0.72);
+  --scrim: rgba(0, 0, 0, 0.32);
+  --bubble-mine: #0a0a0a;
+  --on-bubble-mine: #f5f5f5;
+  --bubble-theirs: #f0f0f0;
+  --on-bubble-theirs: #0a0a0a;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 1px 0 rgba(0, 0, 0, 0.04), 0 8px 24px -8px rgba(0, 0, 0, 0.14);
+  --shadow-3: 0 1px 0 rgba(0, 0, 0, 0.04), 0 24px 48px -12px rgba(0, 0, 0, 0.22), 0 48px 96px -32px rgba(0, 0, 0, 0.22);
+
+  /* radius. squircle 을 지원하면 아래 @supports 에서 조금 키운다 */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* spacing 4 단위 */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-12: 48px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+  --dur-4: 460ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0a0a0a;
+    --surface: #171717;
+    --surface-2: #1f1f1f;
+    --surface-3: #262626;
+    --ink: #f5f5f5;
+    --ink-2: #d4d4d4;
+    --ink-3: #a3a3a3;
+    --ink-4: #737373;
+    --hairline: rgba(255, 255, 255, 0.08);
+    --hairline-strong: rgba(255, 255, 255, 0.14);
+    --accent-text: #f39a45;
+    --danger: #ff6b5e;
+    --glass: rgba(23, 23, 23, 0.72);
+    --scrim: rgba(0, 0, 0, 0.56);
+    --bubble-mine: #f5f5f5;
+    --on-bubble-mine: #0a0a0a;
+    --bubble-theirs: #262626;
+    --on-bubble-theirs: #f5f5f5;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-2: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+    --shadow-3: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0a0a0a;
+  --surface: #171717;
+  --surface-2: #1f1f1f;
+  --surface-3: #262626;
+  --ink: #f5f5f5;
+  --ink-2: #d4d4d4;
+  --ink-3: #a3a3a3;
+  --ink-4: #737373;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
+  --accent-text: #f39a45;
+  --danger: #ff6b5e;
+  --glass: rgba(23, 23, 23, 0.72);
+  --scrim: rgba(0, 0, 0, 0.56);
+  --bubble-mine: #f5f5f5;
+  --on-bubble-mine: #0a0a0a;
+  --bubble-theirs: #262626;
+  --on-bubble-theirs: #f5f5f5;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  --shadow-3: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+}
+
+/* 애플식 연속 곡률 모서리. 지원하는 브라우저에서만 켜고, 같은 크기로 보이게 반경을 키운다 */
+@supports (corner-shape: squircle) {
+  :root {
+    --r-xs: 10px;
+    --r-sm: 16px;
+    --r-md: 21px;
+    --r-lg: 29px;
+    --r-xl: 36px;
+  }
+  *,
+  *::before,
+  *::after {
+    corner-shape: squircle;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* display 를 직접 준 요소도 hidden 속성이면 숨긴다 */
+[hidden] {
+  display: none !important;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 아이콘 버튼: 배경 없이 hover 때만 면이 생긴다 */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-2);
+  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), transform var(--dur-1) var(--ease-out);
+}
+.icon-btn:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+/* 세그먼트 탭. 가운데 thumb 가 미끄러진다 (위치는 JS 가 --x, --w 로 넘긴다) */
+.seg {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  isolation: isolate;
+}
+.seg button {
+  position: relative;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  transition: color var(--dur-2) var(--ease-out);
+}
+.seg button[aria-selected='true'] {
+  color: var(--ink);
+}
+.seg-thumb {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  width: var(--w, 0px);
+  transform: translateX(var(--x, 0px));
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--dur-3) var(--ease-spring), width var(--dur-3) var(--ease-spring);
+}
+
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  background: var(--bubble-theirs);
+}
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  animation: typing 1.2s var(--ease-out) infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* 말풍선 등장 */
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

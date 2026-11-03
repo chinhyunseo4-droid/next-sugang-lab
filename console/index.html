@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NEXT Queue 운영 콘솔</title>
+    <link rel="stylesheet" href="/shared/tokens.css" />
+    <link rel="stylesheet" href="/console/console.css" />
+  </head>
+  <body>
+    <header class="top">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h10M4 12h16M4 17h7" /></svg></span>
+      <h1>NEXT Queue <span>운영 콘솔</span></h1>
+      <span class="conn" id="conn">연결 중</span>
+    </header>
+
+    <main class="wrap">
+      <section class="stats" aria-label="대기열 현황">
+        <div class="stat big"><span>지금 대기</span><b id="s-waiting">0</b><small id="s-split">사람 0 · 가상 0</small></div>
+        <div class="stat"><span>초당 입장</span><b id="s-rate">-</b><small>명 / 초</small></div>
+        <div class="stat"><span>최근 1분 입장</span><b id="s-minute">0</b><small>명</small></div>
+        <div class="stat"><span>누적 입장</span><b id="s-total">0</b><small>명</small></div>
+      </section>
+
+      <section class="panel">
+        <h2>입장 속도</h2>
+        <p class="hint">초당 몇 명을 통과시킬지 정한다. 학교 서버가 버틸 수 있는 만큼만 들여보내는 게 대기열의 일이다.</p>
+        <div class="row">
+          <input id="rate" type="range" min="1" max="50" value="10" aria-label="초당 입장 인원" />
+          <output id="rate-out">10</output>
+        </div>
+        <div class="row btns">
+          <button type="button" data-bots="50">가상 대기자 +50</button>
+          <button type="button" data-bots="200">+200</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>수강신청 시각 <small>실습 진행용 · 원래는 학교 쪽 관리 화면</small></h2>
+        <p class="hint">시작 시각이 되면 가상 학생이 한꺼번에 몰려와 줄을 서고, 인기 과목을 신청한다.</p>
+        <p class="open-at">시작 <b id="open-at">-</b></p>
+        <div class="row btns">
+          <button type="button" data-open="0">지금 시작</button>
+          <button type="button" data-open="30">30초 뒤</button>
+          <button type="button" data-open="60">1분 뒤</button>
+          <button type="button" data-open="600">10분 뒤</button>
+        </div>
+        <div class="row">
+          <label for="rush">시작 때 몰리는 가상 학생</label>
+          <input id="rush" type="number" min="0" max="1000" step="50" value="150" />
+          <button type="button" id="rush-set">적용</button>
+        </div>
+        <div class="row btns">
+          <button type="button" class="danger" id="reset">신청 내역 모두 비우기</button>
+        </div>
+      </section>
+
+      <section class="panel line-panel">
+        <h2>줄 <small>앞에서 40명</small></h2>
+        <ol class="line" id="line"></ol>
+      </section>
+    </main>
+    <script src="/console/console.js"></script>
+  </body>
+</html>
