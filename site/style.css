@@ -895,7 +895,7 @@ svg {
 /* ---- 좁은 화면 ------------------------------------------------------------ */
 @media (max-width: 1100px) {
   .enrolled-area {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .mini-tt {
     max-width: 360px;
@@ -924,7 +924,7 @@ svg {
   }
   .login-grid,
   .dash-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 @media (max-width: 640px) {
