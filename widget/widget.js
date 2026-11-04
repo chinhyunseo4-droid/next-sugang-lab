@@ -32,10 +32,15 @@
   }
 
   // ---- 고객사(부모)와 편지 ------------------------------------------------
-  // TODO [L2] 부모에게 편지 보내기
-  //   - parent.postMessage({ source: 'next-queue', type, payload }, PARENT_ORIGIN)
-  //   - targetOrigin 에 '*' 를 쓰지 않는다
-  function toParent() {}
+  // [L2] 부모에게 편지 보내기
+  function toParent(type, payload) {
+    if (!PARENT_ORIGIN) {
+      setStatus('부모 페이지 주소를 확인할 수 없습니다.');
+      console.error('NEXT Queue: 부모 페이지 origin 을 확인할 수 없어 편지를 보내지 못했습니다.');
+      return;
+    }
+    parent.postMessage({ source: 'next-queue', type: type, payload: payload || {} }, PARENT_ORIGIN);
+  }
 
   function pass(token) {
     document.querySelector('.card').classList.add('passed');
@@ -50,10 +55,14 @@
     }, 350);
   }
 
-  // TODO [L2] 부모의 편지 받기
-  //   - message 리스너에서 e.source 가 parent, e.origin 이 PARENT_ORIGIN 인지 확인한다
-  //   - data.source 가 'next-queue' 이고 type 이 'start' 면 start = payload 로 기억하고 begin()
-  //   - 다 달았으면 맨 아래에서 toParent('ready') 로 "준비됐다"고 알린다
+  // [L2] 부모의 편지 받기
+  window.addEventListener('message', function (e) {
+    if (e.source !== parent || e.origin !== PARENT_ORIGIN) return;
+    var data = e.data;
+    if (!data || data.source !== 'next-queue' || data.type !== 'start') return;
+    start = data.payload || {};
+    begin();
+  });
 
   function begin() {
     // TODO [L3] 진짜 대기열에 줄 서기

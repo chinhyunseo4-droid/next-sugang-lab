@@ -60,13 +60,25 @@
     document.body.appendChild(frame);
   }
 
-  // TODO [L2] iframe 의 편지 받기
-  //   - window 에 message 리스너를 단다
-  //   - e.origin 이 QUEUE_ORIGIN 이 아니거나 e.source 가 frame.contentWindow 가 아니면 무시한다 (남이 보낸 가짜 '통과' 편지 차단)
-  //   - data.source 가 'next-queue' 인 것만 본다
-  //   - type 'ready'  -> post('start', { key, studentId, action }) 로 누가 무엇을 하려는지 알려 준다
-  //   - type 'pass'   -> finish(payload.token)
-  //   - type 'cancel' -> finish(null, 'cancel')
+  // [L2] iframe 의 편지 받기
+  window.addEventListener('message', function (e) {
+    if (!frame || e.origin !== QUEUE_ORIGIN || e.source !== frame.contentWindow) return;
+    var data = e.data;
+    if (!data || data.source !== 'next-queue') return;
+    var payload = data.payload || {};
+
+    if (data.type === 'ready' && pending) {
+      post('start', {
+        key: config.key,
+        studentId: pending.opts.studentId,
+        action: pending.opts.action,
+      });
+    } else if (data.type === 'pass') {
+      finish(payload.token);
+    } else if (data.type === 'cancel') {
+      finish(null, 'cancel');
+    }
+  });
 
   // 고객사가 부르는 하나뿐인 함수. NextQueue('init', {...}) / NextQueue('enter', {...}, cb)
   function api(command, a, b) {
