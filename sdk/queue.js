@@ -49,12 +49,15 @@
   // 줄 서기 시작. opts = { action: 'enroll', studentId }, cb(token, reason)
   function enter(opts, cb) {
     if (pending) return; // 이미 줄 서는 중이면 무시 (버튼 연타 방지)
-    // TODO [L1] 대기 화면 iframe 띄우기
-    //   - injectStyle() 한 번, document.createElement('iframe') 에 class 'nq-frame', src WIDGET_URL
-    //   - iframe.title 은 '접속 대기', sandbox 는 'allow-scripts allow-same-origin'
-    //   - document.body 에 붙이고 frame 변수에 기억, pending = { opts: opts, cb: cb }
-    //   - L1 전에는 아래 stub 처럼 줄을 안 서고 바로 통과시킨다 (토큰 없이). 대기열이 죽으면 그냥 통과시키는 사이트가 실제로 많았다
-    if (cb) cb(null, 'no-queue');
+    // [L1] 대기 화면 iframe 띄우기
+    injectStyle();
+    frame = document.createElement('iframe');
+    frame.className = 'nq-frame';
+    frame.src = WIDGET_URL;
+    frame.title = '접속 대기';
+    frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    pending = { opts: opts, cb: cb };
+    document.body.appendChild(frame);
   }
 
   // TODO [L2] iframe 의 편지 받기
