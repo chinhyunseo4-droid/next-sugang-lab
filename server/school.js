@@ -210,9 +210,11 @@ export function createSchool({ secret }) {
       }
       const p = msg.payload || {};
 
-      // TODO [L6] 서버 시간 알려 주기
-      //   - { type: 'time', payload: { t0 } } 를 받으면 { type: 'time', payload: { t0, server: now() } } 로 바로 돌려준다
-      //   - 브라우저가 보낸 시각(t0), 받은 시각(t1), 서버 시각으로 시계 차이를 계산한다 (site/app.js)
+      // [L6] 서버 시간 알려 주기
+      if (msg.type === 'time' && Number.isFinite(p.t0)) {
+        send({ type: 'time', payload: { t0: p.t0, server: now() } });
+        return;
+      }
 
       // [L5] AI 시간표 에이전트
       if (msg.type !== 'ai_plan') return;

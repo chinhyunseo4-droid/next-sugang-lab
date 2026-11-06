@@ -15,6 +15,7 @@
     ai: null,
   };
   var live = null;
+  var timeSyncTimer = null;
 
   // 운영자가 대기열을 잠깐 끌 수 있게 만든 스위치. 서버가 토큰을 확인하지 않으면 누구나 끌 수 있다 (H2)
   window.QUEUE = { enabled: true };
@@ -298,14 +299,25 @@
     };
   }
 
-  // TODO [L6] 서버 시간 맞추기
-  //   - syncTime: live 로 { type: 'time', payload: { t0: Date.now() } } 를 보낸다. 30초마다 다시
-  //   - onTime(p): t1 = Date.now(), 왕복 시간 rtt = t1 - p.t0
-  //     서버가 답을 만든 순간은 왕복의 가운데쯤이다. offset = p.server + rtt / 2 - t1
-  //   - state.offset = offset, state.synced = true, 시계 라벨을 '서버 시간' 으로 바꾸고 #clock 에 class 'synced'
-  //   - 학교 서버 시계는 일부러 몇 초 어긋나 있다 (server/school.js 의 SKEW). 맞추기 전과 후 카운트다운을 비교해 보라
-  function syncTime() {}
-  function onTime() {}
+  // [L6] 서버 시간 맞추기
+  function syncTime() {
+    function requestTime() {
+      if (!live || live.readyState !== WebSocket.OPEN) return;
+      live.send(JSON.stringify({ type: 'time', payload: { t0: Date.now() } }));
+    }
+    requestTime();
+    if (!timeSyncTimer) timeSyncTimer = setInterval(requestTime, 30_000);
+  }
+
+  function onTime(p) {
+    if (!Number.isFinite(p.t0) || !Number.isFinite(p.server)) return;
+    var t1 = Date.now();
+    var offset = p.server + (t1 - p.t0) / 2 - t1;
+    state.offset = offset;
+    state.synced = true;
+    $('clock-label').textContent = '서버 시간';
+    $('clock').classList.add('synced');
+  }
 
   // TODO [L7] 실시간 잔여석
   //   - onSeats(p): state.seats[p.key] = { count: p.count, cap: p.cap }

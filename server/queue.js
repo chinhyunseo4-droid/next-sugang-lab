@@ -55,7 +55,7 @@ export function createQueue({ secret }) {
   // 0.1초마다 입장 예산을 채우고, 예산만큼 앞사람을 입장시킨다
   setInterval(() => {
     budget = Math.min(budget + rate / 10, rate);
-    while (budget >= 1 && line.length) {
+    while (budget >= 1 && line.length && !line[0].leftAt) {
       budget -= 1;
       admit(line[0]);
     }
@@ -91,9 +91,13 @@ export function createQueue({ secret }) {
     for (const ws of consoles) send(ws, { type: 'stats', payload: stats });
   }, 500);
 
-  // TODO [L6] 끊긴 사람 정리하기
-  //   - 소켓이 끊긴 ticket 은 leftAt 을 기록해 두고 GRACE 동안은 줄에서 빼지 않는다 (새로고침해도 순번 유지)
-  //   - GRACE 가 지나도 돌아오지 않으면 remove 한다
+  // [L6] 끊긴 사람 정리하기
+  setInterval(() => {
+    const now = Date.now();
+    for (const ticket of line) {
+      if (ticket.leftAt && now - ticket.leftAt > GRACE) remove(ticket);
+    }
+  }, 1000);
 
   // ---- WebSocket 한 연결 처리 ----------------------------------------------
   function onConnection(ws) {
@@ -102,10 +106,15 @@ export function createQueue({ secret }) {
     let alive = true;
     let beat = null;
 
-    // TODO [L6] 하트비트: 10초마다 ping 을 보내고, pong 이 안 오면 끊는다
-    //   - 브라우저 WebSocket 은 프로토콜 ping 을 직접 못 보내서, 앱 메시지 { type: 'ping' } / { type: 'pong' } 로 한다
-    //   - alive 가 false 인 채로 다음 차례가 오면 ws.terminate()
-    //   - Network > WS 탭에서 10초마다 오가는 ping/pong 프레임이 보인다
+    // [L6] 하트비트: 10초마다 ping 을 보내고, pong 이 안 오면 끊는다
+    beat = setInterval(() => {
+      if (!alive) {
+        ws.terminate();
+        return;
+      }
+      alive = false;
+      send(ws, { type: 'ping', payload: { t: Date.now() } });
+    }, 10_000);
 
     ws.on('message', (raw) => {
       let msg;
@@ -161,18 +170,29 @@ export function createQueue({ secret }) {
         return;
       }
 
-      // TODO [L6] 다시 붙기
-      //   - { type: 'resume', payload: { ticketId } } 를 받으면 tickets 에서 찾아 ws 를 새 소켓으로 바꾸고 leftAt 을 지운다
-      //   - 못 찾으면 { type: 'error', payload: { code: 'expired' } } (위젯은 처음부터 다시 줄을 선다)
+      // [L6] 다시 붙기
+      if (msg.type === 'resume') {
+        const resumed = tickets.get(String(p.ticketId || ''));
+        if (!resumed || !resumed.leftAt || Date.now() - resumed.leftAt > GRACE) {
+          send(ws, { type: 'error', payload: { code: 'expired' } });
+          return;
+        }
+        if (resumed.ws && resumed.ws !== ws && resumed.ws.readyState === 1) resumed.ws.close();
+        resumed.ws = ws;
+        resumed.leftAt = null;
+        resumed.lastSent = '';
+        ticket = resumed;
+        send(ws, { type: 'joined', payload: { ticketId: resumed.id, ahead: line.indexOf(resumed), resumed: true } });
+        return;
+      }
     });
 
     ws.on('close', () => {
       clearInterval(beat);
       consoles.delete(ws);
       if (ticket && ticket.ws === ws) {
-        // TODO [L6] 끊겨도 바로 빼지 않는다
-        //   - remove 대신 ticket.leftAt = Date.now() 만 기록한다 (정리는 위의 GRACE 타이머가 한다)
-        remove(ticket);
+        // [L6] 끊겨도 바로 빼지 않는다
+        ticket.leftAt = Date.now();
       }
     });
   }
