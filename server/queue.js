@@ -41,10 +41,13 @@ export function createQueue({ secret }) {
     remove(ticket);
     passedTotal += 1;
     passedAt.push(Date.now());
-    let token = null;
-    // TODO [L4] 통과 토큰을 서명해서 준다
-    //   - signToken(secret, { t: 티켓 id, s: 학번, a: action, exp: 지금 + TOKEN_TTL })
-    //   - 학번을 넣어 두면 남의 토큰을 받아 써도 학교 서버가 거절할 수 있다
+    // [L4] 통과 토큰을 서명해서 준다
+    const token = signToken(secret, {
+      t: ticket.id,
+      s: ticket.studentId,
+      a: ticket.action,
+      exp: Date.now() + TOKEN_TTL,
+    });
     if (ticket.bot) return ticket.onPass(token);
     send(ticket.ws, { type: 'pass', payload: { token } });
   }

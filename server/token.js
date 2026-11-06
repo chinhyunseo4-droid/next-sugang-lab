@@ -8,18 +8,27 @@ import crypto from 'node:crypto';
 const b64 = (buf) => Buffer.from(buf).toString('base64url');
 
 export function signToken(secret, payload) {
-  // TODO [L4] 통과 토큰 만들기
-  //   - body = b64(JSON.stringify(payload))
-  //   - mac = crypto.createHmac('sha256', secret).update(body).digest('base64url')
-  //   - body + '.' + mac 을 돌려준다
-  return null;
+  const body = b64(JSON.stringify(payload));
+  const mac = crypto.createHmac('sha256', secret).update(body).digest('base64url');
+  return `${body}.${mac}`;
 }
 
 // 맞으면 내용을, 틀리면 null 을 돌려준다
 export function verifyToken(secret, token) {
-  // TODO [L4] 통과 토큰 검증하기
-  //   - '.' 으로 body 와 mac 을 나누고, 같은 비밀키로 mac 을 다시 계산해 비교한다
-  //   - 비교는 crypto.timingSafeEqual 로 한다 (글자 하나씩 비교하면 시간 차이로 정답이 새어 나간다)
-  //   - 내용을 JSON 으로 풀고, exp 가 지났으면 null
-  return null;
+  if (typeof token !== 'string') return null;
+  const parts = token.split('.');
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return null;
+
+  const [body, mac] = parts;
+  const expected = crypto.createHmac('sha256', secret).update(body).digest();
+  const received = Buffer.from(mac, 'base64url');
+  if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) return null;
+
+  try {
+    const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+    if (!payload || typeof payload !== 'object' || !Number.isFinite(payload.exp) || payload.exp <= Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
+  }
 }
