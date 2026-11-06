@@ -114,17 +114,26 @@ function summarize(name, out) {
 
 // ---- 진짜 모델 ------------------------------------------------------------
 async function liveAgent({ id, prompt, student, tools, emit }) {
-  // TODO [L5] 에이전트 루프 (진짜 모델)
-  //   - 어느 회사 모델이든 루프는 같다. 회사별 차이는 server/providers.js 가 맞춰 준다
-  //   1) const session = provider.start({ system: systemPrompt(student), prompt, tools: TOOLS })
-  //   2) const step = await session.next((text) => emit({ type: 'ai_delta', payload: { id, text } }))
-  //      모델이 쓰는 글자가 오는 대로 WebSocket 으로 흘려보낸다 (스트리밍)
-  //   3) step.refused 면 거절, step.truncated 면 잘림으로 멈춘다. step.calls 가 비었으면 끝
-  //   4) 도구 호출마다 validate 로 입력을 검사하고 runTool 로 실행해서,
-  //      session.reply([{ id, name, output, isError }]) 로 결과를 돌려준다
-  //   5) 2) 로 돌아간다. 단 MAX_TURNS 번을 넘으면 멈춘다 (비용 상한)
-  //   - 키가 없으면 mockAgent 가 같은 순서로 흉내 낸다. 그 코드를 먼저 읽어 보라
-  throw new Error('L5: server/ai.js 의 liveAgent 를 채우세요. 키 없이 보려면 .env 의 AI_PROVIDER=mock');
+  // [L5] 에이전트 루프 (진짜 모델)
+  const session = provider.start({ system: systemPrompt(student), prompt, tools: TOOLS });
+  for (let turn = 0; turn < MAX_TURNS; turn++) {
+    const step = await session.next((text) => emit({ type: 'ai_delta', payload: { id, text } }));
+    if (step.refused) throw new Error('AI가 요청을 거절했습니다.');
+    if (step.truncated) throw new Error('AI 답변이 길이 제한에 도달했습니다.');
+    if (!step.calls.length) return;
+
+    const results = step.calls.map((call) => {
+      const input = validate(call.name, call.input);
+      if (!input) {
+        emit({ type: 'ai_tool', payload: { id, name: call.name, input: {} } });
+        emit({ type: 'ai_tool_result', payload: { id, name: call.name, summary: '도구 입력 검증 실패' } });
+        return { id: call.id, name: call.name, output: { error: '도구 입력이 올바르지 않습니다.' }, isError: true };
+      }
+      return { id: call.id, name: call.name, output: runTool(call.name, input, tools, emit, id) };
+    });
+    session.reply(results);
+  }
+  throw new Error('AI 도구 호출 한도에 도달했습니다. 요청을 간단히 바꿔 주세요.');
 }
 
 // ---- 키가 없을 때 쓰는 모의 에이전트 -------------------------------------

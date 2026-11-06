@@ -214,10 +214,20 @@ export function createSchool({ secret }) {
       //   - { type: 'time', payload: { t0 } } 를 받으면 { type: 'time', payload: { t0, server: now() } } 로 바로 돌려준다
       //   - 브라우저가 보낸 시각(t0), 받은 시각(t1), 서버 시각으로 시계 차이를 계산한다 (site/app.js)
 
-      // TODO [L5] AI 시간표 에이전트
-      //   - { type: 'ai_plan', payload: { prompt } } 를 받으면 runAgent 를 부르고, 나오는 이벤트를 그대로 send 한다
-      //   - 한 사람당 동시에 하나만 (busy). 프롬프트는 300자로 자른다
-      //   - 에이전트가 쓰는 도구는 이 서버의 함수들이다: 과목 검색, 잔여석, 시간 겹침 검사
+      // [L5] AI 시간표 에이전트
+      if (msg.type !== 'ai_plan') return;
+      if (busy) {
+        console.warn('> AI 요청 중복: 이전 시간표 제안을 마칠 때까지 기다려 주세요');
+        return;
+      }
+
+      busy = true;
+      try {
+        const prompt = typeof p.prompt === 'string' ? p.prompt.slice(0, 300) : '';
+        await runAgent({ prompt, student, tools: agentTools(student), emit: send });
+      } finally {
+        busy = false;
+      }
     });
     ws.on('close', () => lives.delete(ws));
   }
