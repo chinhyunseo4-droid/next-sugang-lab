@@ -16,6 +16,7 @@
   };
   var live = null;
   var timeSyncTimer = null;
+  var seatFlashTimers = new WeakMap();
 
   // 운영자가 대기열을 잠깐 끌 수 있게 만든 스위치. 서버가 토큰을 확인하지 않으면 누구나 끌 수 있다 (H2)
   window.QUEUE = { enabled: true };
@@ -319,10 +320,27 @@
     $('clock').classList.add('synced');
   }
 
-  // TODO [L7] 실시간 잔여석
-  //   - onSeats(p): state.seats[p.key] = { count: p.count, cap: p.cap }
-  //   - 화면의 [data-seat="키"] 요소를 모두 찾아 seatCell 과 같은 글자/클래스로 바꾸고, 잠깐 'flash' 클래스를 준다
-  function onSeats() {}
+  // [L7] 실시간 잔여석
+  function onSeats(p) {
+    if (typeof p.key !== 'string' || !Number.isInteger(p.count) || !Number.isInteger(p.cap)) return;
+    state.seats[p.key] = { count: p.count, cap: p.cap };
+    var left = p.cap - p.count;
+    var cls = left <= 0 ? 'full' : left <= 5 ? 'low' : '';
+    document.querySelectorAll('[data-seat]').forEach(function (el) {
+      if (el.dataset.seat !== p.key) return;
+      el.textContent = p.count + ' / ' + p.cap;
+      el.classList.toggle('full', cls === 'full');
+      el.classList.toggle('low', cls === 'low');
+      clearTimeout(seatFlashTimers.get(el));
+      el.classList.remove('flash');
+      void el.offsetWidth;
+      el.classList.add('flash');
+      seatFlashTimers.set(el, setTimeout(function () {
+        el.classList.remove('flash');
+        seatFlashTimers.delete(el);
+      }, 800));
+    });
+  }
 
   // ---- AI 시간표 도우미 화면 (서버 쪽 에이전트는 L5) ----------------------
   var TOOL_LABEL = { search_courses: '과목 검색', check_timetable: '시간표 확인', my_status: '내 상태 확인', propose_plan: '제안 정리' };

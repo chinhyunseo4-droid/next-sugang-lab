@@ -87,8 +87,8 @@ export function createSchool({ secret }) {
     taken.add(studentId);
     keys.add(key);
 
-    // TODO [L7] 잔여석이 바뀌었다고 모두에게 알린다
-    //   - broadcast({ type: 'seats', payload: { key, count: taken.size, cap: course.cap } })
+    // [L7] 잔여석이 바뀌었다고 모두에게 알린다
+    broadcast({ type: 'seats', payload: { key, count: taken.size, cap: course.cap } });
     return { ok: true, status: 200 };
   }
 
@@ -100,11 +100,21 @@ export function createSchool({ secret }) {
     return { ok: true, status: 200 };
   }
 
-  // TODO [L7] 매크로 방지: 10초 안에 6번 넘게 신청하면 보안문자를 풀어야 계속할 수 있다
-  //   - attempts 에 학번별 시각을 쌓고 10초 지난 것은 버린다
-  //   - 넘으면 captchas 에 5글자 정답을 만들어 두고 { status: 429, code: 'captcha_required' } 를 돌려준다
-  //   - 정답이 걸려 있는 동안에는 계속 429
-  function guard() {
+  // [L7] 10초 안에 6번 넘게 신청하면 보안문자를 요구한다
+  function guard(studentId) {
+    if (captchas.has(studentId)) return fail(429, 'captcha_required', '계속 신청하려면 보안문자를 입력하세요.');
+
+    const cutoff = Date.now() - 10_000;
+    const recent = (attempts.get(studentId) || []).filter((at) => at > cutoff);
+    recent.push(Date.now());
+    attempts.set(studentId, recent);
+
+    if (recent.length > 6) {
+      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const answer = Array.from({ length: 5 }, () => alphabet[crypto.randomInt(alphabet.length)]).join('');
+      captchas.set(studentId, answer);
+      return fail(429, 'captcha_required', '계속 신청하려면 보안문자를 입력하세요.');
+    }
     return null;
   }
 
