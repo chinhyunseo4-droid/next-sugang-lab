@@ -65,10 +65,8 @@
   });
 
   function begin() {
-    // TODO [L3] 진짜 대기열에 줄 서기
-    //   - L3 전에는 fakeWait() 로 3초 기다리는 흉내만 낸다
-    //   - L3 에서는 connect() 로 바꾼다
-    fakeWait();
+    // [L3] 진짜 대기열에 줄 서기
+    connect();
   }
 
   // 서버 없이 3초 기다리는 흉내 (L2 까지 확인용)
@@ -89,11 +87,23 @@
   }
 
   function connect() {
-    // TODO [L3] WebSocket 열고 줄 서기
-    //   - ws = new WebSocket(WS_URL)
-    //   - onopen: retry = 0, setStatus(''), joinLine()
-    //   - onmessage: JSON 을 풀어 handle(msg). 못 풀면 무시
-    //   - onclose: onClose
+    // [L3] WebSocket 열고 줄 서기
+    ws = new WebSocket(WS_URL);
+    ws.onopen = function () {
+      retry = 0;
+      setStatus('');
+      joinLine();
+    };
+    ws.onmessage = function (e) {
+      var msg;
+      try {
+        msg = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      handle(msg);
+    };
+    ws.onclose = onClose;
   }
 
   function joinLine() {
@@ -116,11 +126,34 @@
     // TODO [L6] 하트비트 응답
     //   - 'ping' 을 받으면 send('pong', { t: p.t }) 로 바로 답한다. 안 하면 서버가 죽은 연결로 보고 끊는다
 
-    // TODO [L3] 서버가 보내는 메시지 처리
-    //   - 'joined' -> ticketId = p.ticketId 를 sessionStorage 에 저장, render({ ahead: p.ahead, behind: 0, eta: 0 })
-    //   - 'wait'   -> render(p)
-    //   - 'pass'   -> closedByUs = true, ws.close(), pass(p.token)
-    //   - 'error'  -> setStatus 로 이유를 보여 준다. 'expired' 면 티켓을 지우고 다시 join
+    // [L3] 서버가 보내는 메시지 처리
+    if (msg.type === 'joined') {
+      ticketId = p.ticketId;
+      try {
+        sessionStorage.setItem(STORE, ticketId);
+      } catch (err) {
+        console.error('NEXT Queue: 대기 번호표를 저장하지 못했습니다.', err);
+      }
+      render({ ahead: p.ahead, behind: 0, eta: 0 });
+    } else if (msg.type === 'wait') {
+      render(p);
+    } else if (msg.type === 'pass') {
+      closedByUs = true;
+      if (ws) ws.close();
+      pass(p.token);
+    } else if (msg.type === 'error') {
+      if (p.code === 'expired') {
+        ticketId = null;
+        try {
+          sessionStorage.removeItem(STORE);
+        } catch (err) {
+          console.error('NEXT Queue: 만료된 대기 번호표를 지우지 못했습니다.', err);
+        }
+        joinLine();
+      } else {
+        setStatus(p.code === 'bad_action' ? '대기열에 잘못된 요청을 보냈습니다.' : '대기열 오류: ' + String(p.code || 'unknown'));
+      }
+    }
   }
 
   $('cancel').addEventListener('click', function () {

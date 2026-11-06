@@ -58,10 +58,17 @@ export function createQueue({ secret }) {
     }
   }, 100);
 
-  // TODO [L3] 줄 선 사람에게 순번 알려 주기
-  //   - 0.25초마다 line 을 돌면서, 사람(ws 가 있는 ticket)에게 { type: 'wait', payload: { ahead, behind, eta } } 를 보낸다
-  //   - ahead = 내 앞 인원(인덱스), behind = 내 뒤 인원, eta = Math.ceil(ahead / rate) 초
-  //   - 지난번과 같은 내용이면 보내지 않는다 (ticket.lastSent 에 문자열로 기억). 프레임을 아낀다
+  // [L3] 줄 선 사람에게 순번 알려 주기
+  setInterval(() => {
+    line.forEach((ticket, ahead) => {
+      if (!ticket.ws) return;
+      const payload = { ahead, behind: line.length - ahead - 1, eta: Math.ceil(ahead / rate) };
+      const snapshot = JSON.stringify(payload);
+      if (snapshot === ticket.lastSent) return;
+      ticket.lastSent = snapshot;
+      send(ticket.ws, { type: 'wait', payload });
+    });
+  }, 250);
 
   // 콘솔에 숫자 보내기
   setInterval(() => {
@@ -131,11 +138,25 @@ export function createQueue({ secret }) {
         return;
       }
 
-      // TODO [L3] 줄 서기
-      //   - { type: 'join', payload: { key, studentId, action } } 을 받으면 newTicket({ studentId, action, ws }) 로 줄 끝에 세운다
-      //   - 받은 값은 믿지 않는다: studentId 는 문자열로 자르고, action 은 'enroll' 만 허용
-      //   - { type: 'joined', payload: { ticketId, ahead } } 로 답한다
-      //   - { type: 'leave' } 를 받으면 remove(ticket)
+      // [L3] 줄 서기
+      if (msg.type === 'join') {
+        if (ticket) return;
+        const studentId = String(p.studentId ?? '').slice(0, 40);
+        if (!studentId || p.action !== 'enroll') {
+          send(ws, { type: 'error', payload: { code: 'bad_action' } });
+          return;
+        }
+        ticket = newTicket({ studentId, action: 'enroll', ws });
+        send(ws, { type: 'joined', payload: { ticketId: ticket.id, ahead: line.length - 1 } });
+        return;
+      }
+      if (msg.type === 'leave') {
+        if (ticket) {
+          remove(ticket);
+          ticket = null;
+        }
+        return;
+      }
 
       // TODO [L6] 다시 붙기
       //   - { type: 'resume', payload: { ticketId } } 를 받으면 tickets 에서 찾아 ws 를 새 소켓으로 바꾸고 leftAt 을 지운다
